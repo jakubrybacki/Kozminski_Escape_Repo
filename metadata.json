@@ -1,6 +1,6 @@
 {
   "name": "Kozminski Escape: Polowanie na ECTS",
-  "description": "Dynamiczna gra zręcznościowa 2D w realiach Akademii Leona Koźmińskiego (ALK) w Warszawie. Uciekaj przed Egzaminatorem i zdobądź 30 ECTS!",
+  "description": "Dynamiczna gra zręcznościowa 2D na kampusie Akademii Leona Koźmińskiego. Zbieraj punkty ECTS i uciekaj przed surowym Egzaminatorem!",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

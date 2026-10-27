@@ -1,227 +1,274 @@
 /**
  * Kozminski Escape: Polowanie na ECTS
- * js/audio.js - Moduł syntezy dźwięków (Web Audio API)
- * Akademia Leona Koźmińskiego w Warszawie
+ * js/audio.js - Moduł syntezatora dźwięków oparty na Web Audio API
+ * Działa bez zewnętrznych plików audio, natychmiastowo i bez opóźnień.
  */
 
-class SoundManager {
+class KozminskiAudioManager {
   constructor() {
-    this.audioCtx = null;
+    this.ctx = null;
     this.isMuted = false;
-    this.initialized = false;
+    this.masterGain = null;
+    this.isBgmPlaying = false;
+    this.bgmTimer = null;
+    this.bgmNoteIndex = 0;
   }
 
+  // Inicjalizacja AudioContext po pierwszej interakcji użytkownika (wymóg przeglądarek)
   init() {
-    if (this.initialized) return;
+    if (this.ctx) return;
     try {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (AudioContextClass) {
-        this.audioCtx = new AudioContextClass();
-        this.initialized = true;
-      }
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+      this.masterGain = this.ctx.createGain();
+      this.masterGain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+      this.masterGain.connect(this.ctx.destination);
     } catch (e) {
-      console.warn('Web Audio API not supported or blocked:', e);
+      console.warn("Web Audio API nie jest wspierane w tej przeglądarce", e);
     }
   }
 
   resumeContext() {
-    this.init();
-    if (this.audioCtx && this.audioCtx.state === 'suspended') {
-      this.audioCtx.resume();
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
     }
   }
 
   toggleMute() {
     this.isMuted = !this.isMuted;
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setValueAtTime(this.isMuted ? 0 : 0.3, this.ctx.currentTime);
+    }
     return this.isMuted;
   }
 
-  /**
-   * Dźwięk zebrania punktu ECTS (melodyjny brzęk zaliczenia)
-   */
-  playCollectEcts() {
+  // Dźwięk podniesienia punktu ECTS (melodyjny dzwonek)
+  playCollectECTS(points = 1) {
     if (this.isMuted) return;
+    this.init();
     this.resumeContext();
-    if (!this.audioCtx) return;
+    if (!this.ctx) return;
 
-    const ctx = this.audioCtx;
-    const now = ctx.currentTime;
-
-    const osc1 = ctx.createOscillator();
-    const osc2 = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc1.type = 'sine';
-    osc2.type = 'triangle';
-
-    osc1.frequency.setValueAtTime(523.25, now); // C5
-    osc1.frequency.exponentialRampToValueAtTime(1046.5, now + 0.12); // C6
-
-    osc2.frequency.setValueAtTime(659.25, now); // E5
-    osc2.frequency.exponentialRampToValueAtTime(1318.51, now + 0.15); // E6
-
-    gain.gain.setValueAtTime(0.18, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
-
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + 0.25);
-    osc2.stop(now + 0.25);
-  }
-
-  /**
-   * Dźwięk wypicia kawy (odnowienie staminy)
-   */
-  playDrinkCoffee() {
-    if (this.isMuted) return;
-    this.resumeContext();
-    if (!this.audioCtx) return;
-
-    const ctx = this.audioCtx;
-    const now = ctx.currentTime;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    const baseFreq = points > 1 ? 587.33 : 523.25; // D5 lub C5
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
 
     osc.type = 'sine';
-    osc.frequency.setValueAtTime(330, now);
-    osc.frequency.linearRampToValueAtTime(660, now + 0.08);
-    osc.frequency.linearRampToValueAtTime(880, now + 0.16);
+    const now = this.ctx.currentTime;
+    osc.frequency.setValueAtTime(baseFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(baseFreq * 1.5, now + 0.12);
 
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.masterGain);
 
     osc.start(now);
-    osc.stop(now + 0.28);
+    osc.stop(now + 0.25);
   }
 
-  /**
-   * Dźwięk aury Lwa Koźmińskiego (nietykalność)
-   */
-  playLionRoar() {
+  // Dźwięk wypicia kawy w Kawiarni ALK (energetyczny akord w górę)
+  playCoffeeBoost() {
     if (this.isMuted) return;
+    this.init();
     this.resumeContext();
-    if (!this.audioCtx) return;
+    if (!this.ctx) return;
 
-    const ctx = this.audioCtx;
-    const now = ctx.currentTime;
+    const notes = [329.63, 415.30, 493.88, 659.25]; // E-dur arpeggio
+    notes.forEach((freq, i) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const now = this.ctx.currentTime + i * 0.05;
 
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+
+      osc.start(now);
+      osc.stop(now + 0.3);
+    });
+  }
+
+  // Dźwięk zdobycia Złotej Legitymacji (błyszcząca ochrona)
+  playShield() {
+    if (this.isMuted) return;
+    this.init();
+    this.resumeContext();
+    if (!this.ctx) return;
+
+    const notes = [440, 554.37, 659.25, 880];
+    notes.forEach((freq, idx) => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const now = this.ctx.currentTime + idx * 0.07;
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+      osc.connect(gain);
+      gain.connect(this.masterGain);
+
+      osc.start(now);
+      osc.stop(now + 0.35);
+    });
+  }
+
+  // Dźwięk alertu: Egzaminator zauważył studenta! (napięcie)
+  playAlert() {
+    if (this.isMuted) return;
+    this.init();
+    this.resumeContext();
+    if (!this.ctx) return;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const now = this.ctx.currentTime;
 
     osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(180, now);
-    osc.frequency.exponentialRampToValueAtTime(380, now + 0.15);
-    osc.frequency.exponentialRampToValueAtTime(120, now + 0.45);
-
-    gain.gain.setValueAtTime(0.15, now);
-    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.5);
-  }
-
-  /**
-   * Dźwięk okrzyku profesora / alarmu egzaminacyjnego
-   */
-  playProfessorAlert() {
-    if (this.isMuted) return;
-    this.resumeContext();
-    if (!this.audioCtx) return;
-
-    const ctx = this.audioCtx;
-    const now = ctx.currentTime;
-
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    osc.type = 'square';
     osc.frequency.setValueAtTime(220, now);
-    osc.frequency.setValueAtTime(185, now + 0.08);
-    osc.frequency.setValueAtTime(246, now + 0.16);
+    osc.frequency.linearRampToValueAtTime(440, now + 0.15);
 
-    gain.gain.setValueAtTime(0.12, now);
-    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.28);
+    gain.gain.setValueAtTime(0.22, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(this.masterGain);
 
     osc.start(now);
     osc.stop(now + 0.3);
   }
 
-  /**
-   * Fanfara zwycięstwa - Zaliczony Semestr
-   */
-  playVictory() {
+  // Dźwięk porażki (Kampania Wrześniowa - opadający minor)
+  playGameOver() {
     if (this.isMuted) return;
+    this.init();
     this.resumeContext();
-    if (!this.audioCtx) return;
+    if (!this.ctx) return;
 
-    const ctx = this.audioCtx;
-    const now = ctx.currentTime;
-    const notes = [261.63, 329.63, 392.0, 523.25, 659.25, 783.99, 1046.5]; // C4, E4, G4, C5, E5, G5, C6
-
+    const notes = [392.00, 369.99, 329.63, 293.66, 261.63];
     notes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      const now = this.ctx.currentTime + idx * 0.15;
 
       osc.type = 'triangle';
-      osc.frequency.value = freq;
+      osc.frequency.setValueAtTime(freq, now);
 
-      const noteTime = now + idx * 0.1;
-      gain.gain.setValueAtTime(0.15, noteTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.4);
+      gain.gain.setValueAtTime(0.3, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.masterGain);
 
-      osc.start(noteTime);
-      osc.stop(noteTime + 0.45);
+      osc.start(now);
+      osc.stop(now + 0.45);
     });
   }
 
-  /**
-   * Dźwięk porażki - Kampania Wrześniowa
-   */
-  playGameOver() {
+  // Fanfara zwycięstwa (Zaliczony Semestr!)
+  playVictory() {
     if (this.isMuted) return;
+    this.init();
     this.resumeContext();
-    if (!this.audioCtx) return;
+    if (!this.ctx) return;
 
-    const ctx = this.audioCtx;
-    const now = ctx.currentTime;
-    const notes = [311.13, 293.66, 277.18, 261.63, 196.0]; // Eb4, D4, Db4, C4, G3
+    // Triumfalne nuty: C - E - G - C5 - E5
+    const fanfare = [
+      { f: 261.63, d: 0.15 },
+      { f: 329.63, d: 0.15 },
+      { f: 392.00, d: 0.15 },
+      { f: 523.25, d: 0.3 },
+      { f: 659.25, d: 0.6 }
+    ];
 
-    notes.forEach((freq, idx) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
+    let timeAcc = this.ctx.currentTime;
+    fanfare.forEach(note => {
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
 
-      osc.type = 'sawtooth';
-      osc.frequency.value = freq;
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(note.f, timeAcc);
 
-      const noteTime = now + idx * 0.18;
-      gain.gain.setValueAtTime(0.18, noteTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, noteTime + 0.35);
+      gain.gain.setValueAtTime(0.18, timeAcc);
+      gain.gain.exponentialRampToValueAtTime(0.001, timeAcc + note.d);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(this.masterGain);
 
-      osc.start(noteTime);
-      osc.stop(noteTime + 0.4);
+      osc.start(timeAcc);
+      osc.stop(timeAcc + note.d);
+
+      timeAcc += note.d * 0.9;
+    });
+  }
+
+  // Dźwięk uderzenia Artylerii ECTS / odesłania do kąta (gwizd pocisku + eksplozja + komiczny dzwonek)
+  playArtilleryStrike() {
+    if (this.isMuted) return;
+    this.init();
+    this.resumeContext();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+
+    // 1. Opadający gwizd artylerii
+    const whistleOsc = this.ctx.createOscillator();
+    const whistleGain = this.ctx.createGain();
+    whistleOsc.type = 'sine';
+    whistleOsc.frequency.setValueAtTime(1400, now);
+    whistleOsc.frequency.exponentialRampToValueAtTime(160, now + 0.35);
+
+    whistleGain.gain.setValueAtTime(0.25, now);
+    whistleGain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+    whistleOsc.connect(whistleGain);
+    whistleGain.connect(this.masterGain);
+    whistleOsc.start(now);
+    whistleOsc.stop(now + 0.35);
+
+    // 2. Eksplozja basowa (uderzenie w cel)
+    const boomOsc = this.ctx.createOscillator();
+    const boomGain = this.ctx.createGain();
+    boomOsc.type = 'sawtooth';
+    boomOsc.frequency.setValueAtTime(120, now + 0.32);
+    boomOsc.frequency.exponentialRampToValueAtTime(30, now + 0.7);
+
+    boomGain.gain.setValueAtTime(0.4, now + 0.32);
+    boomGain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+
+    boomOsc.connect(boomGain);
+    boomGain.connect(this.masterGain);
+    boomOsc.start(now + 0.32);
+    boomOsc.stop(now + 0.7);
+
+    // 3. Komiczne gwiazdki / dzwonki ogłuszenia ("stoję w kącie")
+    [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+      const bellOsc = this.ctx.createOscillator();
+      const bellGain = this.ctx.createGain();
+      const bellTime = now + 0.6 + idx * 0.1;
+
+      bellOsc.type = 'triangle';
+      bellOsc.frequency.setValueAtTime(freq, bellTime);
+
+      bellGain.gain.setValueAtTime(0.2, bellTime);
+      bellGain.gain.exponentialRampToValueAtTime(0.001, bellTime + 0.25);
+
+      bellOsc.connect(bellGain);
+      bellGain.connect(this.masterGain);
+      bellOsc.start(bellTime);
+      bellOsc.stop(bellTime + 0.25);
     });
   }
 }
 
-// Globalna instancja dostępna dla gry
-window.soundManager = new SoundManager();
+// Globalna instancja audio
+window.KozminskiAudio = new KozminskiAudioManager();
