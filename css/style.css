@@ -242,6 +242,254 @@ body {
   transform: translateY(1px);
 }
 
+/* Pogoda w pasku HUD */
+.hud-weather-box {
+  min-width: 175px;
+}
+
+.hud-temp {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--alk-gold-accent);
+}
+
+.hud-weather-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(242, 169, 0, 0.35);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.hud-weather-pill:hover {
+  background: rgba(242, 169, 0, 0.15);
+  border-color: var(--alk-gold-accent);
+  transform: translateY(-1px);
+}
+
+.hud-weather-pill .weather-icon {
+  font-size: 1rem;
+}
+
+/* ==========================================================================
+   2b. Panel Pogody Gemini AI i Kolorowania Terenu Kampusu
+   ========================================================================== */
+
+.weather-drawer {
+  width: 100%;
+  max-width: 820px;
+  background: rgba(10, 22, 44, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(242, 169, 0, 0.4);
+  border-radius: 12px;
+  padding: 12px 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.weather-drawer.collapsed {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  opacity: 0;
+  overflow: hidden;
+  border-color: transparent;
+  pointer-events: none;
+}
+
+.weather-drawer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (min-width: 760px) {
+  .weather-drawer-inner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+}
+
+.weather-info-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.weather-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.weather-ai-badge {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  color: #ffffff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 999px;
+  letter-spacing: 0.03em;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+}
+
+.weather-source-tag {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 999px;
+}
+
+.weather-time-tag {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.weather-desc {
+  font-size: 0.83rem;
+  color: #e2e8f0;
+  line-height: 1.35;
+}
+
+.weather-commentary {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--alk-gold-light);
+  line-height: 1.3;
+}
+
+.weather-theme-switchers {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.weather-switch-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.weather-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.weather-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #f1f5f9;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.weather-theme-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.weather-theme-btn.active {
+  border-color: var(--alk-gold-accent);
+  background: rgba(242, 169, 0, 0.18);
+  box-shadow: 0 0 12px rgba(242, 169, 0, 0.35);
+}
+
+.weather-theme-btn.active[data-theme="sunny"] {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.2);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+.weather-theme-btn.active[data-theme="rainy"] {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+}
+
+.weather-theme-btn.active[data-theme="night"] {
+  border-color: #e2e8f0;
+  background: rgba(15, 23, 42, 0.7);
+  box-shadow: 0 0 12px rgba(226, 232, 240, 0.3);
+}
+
+.weather-color-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.badge-green {
+  background: #15803d;
+  color: #bbf7d0;
+}
+
+.badge-blue {
+  background: #1d4ed8;
+  color: #bfdbfe;
+}
+
+.badge-black {
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #f1f5f9;
+}
+
+.btn-gemini-refresh {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.4);
+  color: #c4b5fd;
+}
+
+.btn-gemini-refresh:hover {
+  background: rgba(139, 92, 246, 0.3);
+  border-color: #8b5cf6;
+}
+
+.refresh-icon.spinning {
+  display: inline-block;
+  animation: spinAnim 0.8s linear infinite;
+}
+
+@keyframes spinAnim {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
 /* ==========================================================================
    3. Kontener gry i pole Canvas
    ========================================================================== */

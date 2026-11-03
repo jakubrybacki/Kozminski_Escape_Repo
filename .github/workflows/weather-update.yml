@@ -1,0 +1,43 @@
+name: Update Campus Weather with Gemini AI
+
+on:
+  schedule:
+    # Uruchamiaj co 6 godzin, aby aktualizować pogodę w kampusie ALK
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Umożliwia ręczne uruchomienie akcji w zakładce Actions na GitHubie
+  push:
+    paths:
+      - 'scripts/update-weather.mjs'
+      - '.github/workflows/weather-update.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-weather:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repozytorium
+        uses: actions/checkout@v4
+
+      - name: Konfiguracja środowiska Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Instalacja zależności
+        run: npm install --include=dev
+
+      - name: Pobierz pogodę z Gemini AI i zaktualizuj weather.json
+        env:
+          # Klucz pobierany z GitHub Actions Secrets (zmienna środowiskowa projektu)
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node scripts/update-weather.mjs
+
+      - name: Zapisz i zacommituj zaktualizowaną pogodę
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add public/weather.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(weather): aktualizacja pogody kampusu z Gemini AI [skip ci]" && git push)

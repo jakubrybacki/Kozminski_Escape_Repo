@@ -57,8 +57,23 @@
           <div id="campus-status" class="hud-status-text">Budynek A · Hol Główny</div>
         </div>
 
-        <!-- Przyciski pomocnicze HUD (Dźwięk / Pauza) -->
+        <!-- Pogoda kampusu (Gemini AI & GitHub Actions) -->
+        <div class="hud-stat hud-weather-box" id="hud-weather-box" title="Kliknij, aby rozwinąć panel pogody Gemini i koloru terenu">
+          <div class="hud-label-row">
+            <span class="hud-label">Pogoda ALK (Gemini)</span>
+            <span id="weather-temp" class="hud-temp hud-mono">21°C</span>
+          </div>
+          <button id="btn-weather-badge" class="hud-weather-pill" type="button" aria-label="Zmień pogodę kampusu">
+            <span id="weather-icon" class="weather-icon">☀️</span>
+            <span id="weather-condition-text" class="weather-text">Słonecznie · Zielony</span>
+          </button>
+        </div>
+
+        <!-- Przyciski pomocnicze HUD (Pogoda / Dźwięk / Pauza) -->
         <div class="hud-controls">
+          <button id="btn-weather-menu" class="hud-btn hud-weather-btn" type="button" aria-label="Menu Pogody Gemini" title="Pogoda Gemini AI / Zmień kolor kampusu">
+            <span id="weather-btn-icon">🌤️</span>
+          </button>
           <button id="btn-sound-toggle" class="hud-btn" type="button" aria-label="Włącz/Wyłącz dźwięk" title="Wycisz lub włącz dźwięki">
             <span id="sound-icon">🔊</span>
           </button>
@@ -67,6 +82,50 @@
           </button>
         </div>
       </header>
+
+      <!-- Panel Pogody Gemini AI i kolorowania terenu (Zielony / Niebieski / Czarny) -->
+      <section id="weather-drawer" class="weather-drawer" aria-label="Pogoda kampusu i kolory terenu">
+        <div class="weather-drawer-inner">
+          <div class="weather-info-col">
+            <div class="weather-meta-row">
+              <span class="weather-ai-badge">✨ Gemini 3.8 Flash</span>
+              <span id="weather-source-badge" class="weather-source-tag">GitHub Actions</span>
+              <span id="weather-time-badge" class="weather-time-tag">Aktualna prognoza</span>
+            </div>
+            <div id="weather-desc-text" class="weather-desc">
+              Słoneczny dzień nad kampusem ALK przy ul. Jagiellońskiej. Teren pomalowany na zielono!
+            </div>
+            <div id="weather-commentary-text" class="weather-commentary">
+              „Słoneczny dzień to idealny moment na zaliczenie mikroekonomii na zielonym Patio!”
+            </div>
+          </div>
+
+          <div class="weather-theme-switchers">
+            <div class="weather-switch-label">Kolor terenu kampusu wg pogody:</div>
+            <div class="weather-btn-group">
+              <button id="btn-weather-sunny" class="weather-theme-btn active" type="button" data-theme="sunny" title="Słonecznie - Teren pomalowany na ZIELONO">
+                <span class="weather-btn-emoji">☀️</span>
+                <span class="weather-btn-name">Słonecznie</span>
+                <span class="weather-color-badge badge-green">Zielony</span>
+              </button>
+              <button id="btn-weather-rainy" class="weather-theme-btn" type="button" data-theme="rainy" title="Deszczowo - Teren pomalowany na NIEBIESKO">
+                <span class="weather-btn-emoji">🌧️</span>
+                <span class="weather-btn-name">Deszczowo</span>
+                <span class="weather-color-badge badge-blue">Niebieski</span>
+              </button>
+              <button id="btn-weather-night" class="weather-theme-btn" type="button" data-theme="night" title="Noc - Teren pomalowany na CZARNO">
+                <span class="weather-btn-emoji">🌙</span>
+                <span class="weather-btn-name">Noc</span>
+                <span class="weather-color-badge badge-black">Czarny</span>
+              </button>
+              <button id="btn-refresh-weather" class="weather-theme-btn btn-gemini-refresh" type="button" title="Pobierz najświeższe dane pogodowe z chatbota Gemini">
+                <span id="refresh-spin-icon" class="refresh-icon">🔄</span>
+                <span class="weather-btn-name">Gemini AI</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- Główny obszar gry -->
       <main class="game-viewport">
@@ -174,6 +233,14 @@
                 <div class="legend-text">
                   <div class="legend-title">Surowy Egzaminator</div>
                   <div class="legend-desc">Unikaj go za wszelką cenę! Jeśli Cię dogoni – czeka Cię Kampania Wrześniowa!</div>
+                </div>
+              </div>
+
+              <div class="legend-card">
+                <div class="legend-icon">🌤️</div>
+                <div class="legend-text">
+                  <div class="legend-title">Pogoda Gemini AI & Teren ALK</div>
+                  <div class="legend-desc">GitHub Actions synchronizuje pogodę z Gemini: słonecznie (zielony kampus), deszczowo (niebieski) lub noc (czarny)!</div>
                 </div>
               </div>
             </div>
@@ -286,7 +353,7 @@
     </div>
 
     <!-- 5. Poprawne podpięcie zewnętrznych skryptów (ścieżki względne dla GitHub Pages) -->
-    <script src="./js/audio.js"></script>
-    <script src="./js/game.js"></script>
+    <script type="module" src="./js/audio.js"></script>
+    <script type="module" src="./js/game.js"></script>
   </body>
 </html>

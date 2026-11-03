@@ -45,6 +45,39 @@ class KozminskiEscapeGame {
     this.btnPauseToggle = document.getElementById('btn-pause-toggle');
     this.pauseIcon = document.getElementById('pause-icon');
 
+    // Elementy Pogody Gemini AI
+    this.weatherBoxEl = document.getElementById('hud-weather-box');
+    this.weatherTempEl = document.getElementById('weather-temp');
+    this.weatherIconEl = document.getElementById('weather-icon');
+    this.weatherTextEl = document.getElementById('weather-condition-text');
+    this.weatherDrawerEl = document.getElementById('weather-drawer');
+    this.weatherDescEl = document.getElementById('weather-desc-text');
+    this.weatherCommentaryEl = document.getElementById('weather-commentary-text');
+    this.weatherSourceBadgeEl = document.getElementById('weather-source-badge');
+    this.btnWeatherMenu = document.getElementById('btn-weather-menu');
+    this.btnWeatherBadge = document.getElementById('btn-weather-badge');
+    this.btnWeatherSunny = document.getElementById('btn-weather-sunny');
+    this.btnWeatherRainy = document.getElementById('btn-weather-rainy');
+    this.btnWeatherNight = document.getElementById('btn-weather-night');
+    this.btnRefreshWeather = document.getElementById('btn-refresh-weather');
+    this.refreshSpinIcon = document.getElementById('refresh-spin-icon');
+
+    // Stan pogody (domyślnie słonecznie -> zielony kampus)
+    this.weather = {
+      condition: 'sunny', // 'sunny' | 'rainy' | 'night'
+      conditionName: 'Słonecznie',
+      temperature: '21°C',
+      description: 'Słoneczny dzień nad kampusem ALK przy ul. Jagiellońskiej. Teren pomalowany na zielono!',
+      commentary: '„Słoneczny dzień to idealny moment na zaliczenie mikroekonomii na zielonym Patio!”',
+      terrainColorTheme: 'zielony',
+      source: 'Gemini AI via GitHub Actions',
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Krople deszczu dla trybu deszczowego (niebieski kampus)
+    this.rainDrops = [];
+    this.initRainDrops();
+
     // Statystyki do podsumowania
     this.gameoverEctsEl = document.getElementById('gameover-ects-value');
     this.gameoverTimeEl = document.getElementById('gameover-time-value');
@@ -102,6 +135,9 @@ class KozminskiEscapeGame {
 
     // Event listenery
     this.initEvents();
+
+    // Załaduj aktualną pogodę z Gemini AI / GitHub Actions
+    this.loadWeatherFromSource();
   }
 
   setupCampusMap() {
@@ -335,8 +371,199 @@ class KozminskiEscapeGame {
       this.togglePause();
     });
 
+    // Kontrolki Pogody Gemini AI
+    if (this.btnWeatherMenu) {
+      this.btnWeatherMenu.addEventListener('click', () => this.toggleWeatherDrawer());
+    }
+    if (this.btnWeatherBadge) {
+      this.btnWeatherBadge.addEventListener('click', () => this.toggleWeatherDrawer());
+    }
+    if (this.btnWeatherSunny) {
+      this.btnWeatherSunny.addEventListener('click', () => this.setWeatherCondition('sunny'));
+    }
+    if (this.btnWeatherRainy) {
+      this.btnWeatherRainy.addEventListener('click', () => this.setWeatherCondition('rainy'));
+    }
+    if (this.btnWeatherNight) {
+      this.btnWeatherNight.addEventListener('click', () => this.setWeatherCondition('night'));
+    }
+    if (this.btnRefreshWeather) {
+      this.btnRefreshWeather.addEventListener('click', () => this.refreshWeatherFromGemini());
+    }
+
     // Rozpoczęcie pętli renderującej
     requestAnimationFrame((time) => this.gameLoop(time));
+  }
+
+  initRainDrops() {
+    this.rainDrops = [];
+    for (let i = 0; i < 75; i++) {
+      this.rainDrops.push({
+        x: Math.random() * (this.width + 120) - 60,
+        y: Math.random() * this.height,
+        length: 9 + Math.random() * 12,
+        speed: 300 + Math.random() * 160,
+      });
+    }
+  }
+
+  updateRain(dt) {
+    for (const drop of this.rainDrops) {
+      drop.y += drop.speed * dt;
+      drop.x -= 40 * dt;
+      if (drop.y > this.height) {
+        drop.y = -drop.length;
+        drop.x = Math.random() * (this.width + 120) - 60;
+      }
+    }
+  }
+
+  toggleWeatherDrawer() {
+    if (this.weatherDrawerEl) {
+      this.weatherDrawerEl.classList.toggle('collapsed');
+    }
+  }
+
+  async loadWeatherFromSource() {
+    try {
+      // 1. Próba pobrania z endpointu serwerowego Gemini
+      const res = await fetch('/api/weather');
+      if (res.ok) {
+        const data = await res.json();
+        this.applyWeatherData(data);
+        return;
+      }
+    } catch (e) {
+      // serwer może być w trybie czysto statycznym
+    }
+
+    try {
+      // 2. Próba pobrania statycznego pliku weather.json (generowanego przez GitHub Actions)
+      const res = await fetch('./weather.json');
+      if (res.ok) {
+        const data = await res.json();
+        this.applyWeatherData(data);
+        return;
+      }
+    } catch (e) {
+      console.warn('Nie udało się pobrać ./weather.json:', e);
+    }
+
+    // 3. Fallback do stanu domyślnego
+    this.updateWeatherUI();
+  }
+
+  applyWeatherData(data) {
+    if (!data) return;
+    this.weather = {
+      ...this.weather,
+      ...data,
+      condition: ['sunny', 'rainy', 'night'].includes(data.condition) ? data.condition : 'sunny',
+    };
+    this.updateWeatherUI();
+  }
+
+  setWeatherCondition(condition) {
+    let conditionName = 'Słonecznie';
+    let terrainColor = 'zielony';
+    let temp = '21°C';
+    let desc = 'Słoneczny dzień nad kampusem ALK przy ul. Jagiellońskiej. Teren pomalowany na zielono!';
+    let comment = '„Słoneczny dzień to idealny moment na zaliczenie mikroekonomii na zielonym Patio!”';
+
+    if (condition === 'rainy') {
+      conditionName = 'Deszczowo';
+      terrainColor = 'niebieski';
+      temp = '13°C';
+      desc = 'Deszcz nad kampusem ALK! Teren skąpany w deszczowym błękicie, posadzki pomalowane na niebiesko.';
+      comment = '„Deszcz bębni o okna auli! Prawdziwy lider Koźmińskiego zdaje egzamin w każdą niepogodę!”';
+    } else if (condition === 'night') {
+      conditionName = 'Noc';
+      terrainColor = 'czarny';
+      temp = '8°C';
+      desc = 'Nocna sesja nad kampusem ALK. Teren spowity w aksamitnej czerni, lśnią latarnie i złoty Lew.';
+      comment = '„Cisza nocna w Dziekanacie! Lepiej zbieraj ECTS przed nadejściem porannego egzaminu!”';
+    }
+
+    this.weather = {
+      ...this.weather,
+      condition,
+      conditionName,
+      temperature: temp,
+      description: desc,
+      commentary: comment,
+      terrainColorTheme: terrainColor,
+      source: 'Wybór gracza / Gemini AI',
+    };
+
+    this.updateWeatherUI();
+    this.showProfessorSpeech(comment, 4.0);
+  }
+
+  async refreshWeatherFromGemini() {
+    if (this.refreshSpinIcon) {
+      this.refreshSpinIcon.classList.add('spinning');
+    }
+
+    try {
+      const res = await fetch('/api/weather/refresh', { method: 'POST' });
+      if (res.ok) {
+        const json = await res.json();
+        if (json.weather) {
+          this.applyWeatherData(json.weather);
+          this.showProfessorSpeech(`„Raport pogodowy Gemini: ${this.weather.conditionName}! Teren pomalowany na ${this.weather.terrainColorTheme}.”`, 4.5);
+          if (this.refreshSpinIcon) {
+            setTimeout(() => this.refreshSpinIcon.classList.remove('spinning'), 600);
+          }
+          return;
+        }
+      }
+    } catch (err) {
+      // fallback do odświeżenia z pliku
+    }
+
+    await this.loadWeatherFromSource();
+    this.showProfessorSpeech(`„Pobrano aurę z GitHub Actions: ${this.weather.conditionName} (${this.weather.temperature}). Teren: ${this.weather.terrainColorTheme}!”`, 4);
+
+    if (this.refreshSpinIcon) {
+      setTimeout(() => {
+        this.refreshSpinIcon.classList.remove('spinning');
+      }, 600);
+    }
+  }
+
+  updateWeatherUI() {
+    const w = this.weather;
+    const isSunny = w.condition === 'sunny';
+    const isRainy = w.condition === 'rainy';
+    const isNight = w.condition === 'night';
+
+    // Ikona i tekst w HUD
+    if (this.weatherIconEl) {
+      this.weatherIconEl.textContent = isSunny ? '☀️' : (isRainy ? '🌧️' : '🌙');
+    }
+    if (this.weatherTextEl) {
+      const colorLabel = isSunny ? 'Zielony' : (isRainy ? 'Niebieski' : 'Czarny');
+      this.weatherTextEl.textContent = `${w.conditionName} · ${colorLabel}`;
+    }
+    if (this.weatherTempEl) {
+      this.weatherTempEl.textContent = w.temperature || '20°C';
+    }
+
+    // Szczegóły w panelu pogodowym
+    if (this.weatherDescEl) {
+      this.weatherDescEl.textContent = w.description;
+    }
+    if (this.weatherCommentaryEl) {
+      this.weatherCommentaryEl.textContent = w.commentary;
+    }
+    if (this.weatherSourceBadgeEl) {
+      this.weatherSourceBadgeEl.textContent = w.source || 'GitHub Actions';
+    }
+
+    // Aktywne przyciski
+    if (this.btnWeatherSunny) this.btnWeatherSunny.classList.toggle('active', isSunny);
+    if (this.btnWeatherRainy) this.btnWeatherRainy.classList.toggle('active', isRainy);
+    if (this.btnWeatherNight) this.btnWeatherNight.classList.toggle('active', isNight);
   }
 
   togglePause() {
@@ -378,6 +605,11 @@ class KozminskiEscapeGame {
     if (this.state !== GameState.PLAYING) return;
 
     this.elapsedSeconds += dt;
+
+    // Aktualizacja deszczu jeśli wybrano tryb deszczowy (niebieski kampus)
+    if (this.weather.condition === 'rainy') {
+      this.updateRain(dt);
+    }
 
     // Dymek profesora licznik
     if (this.bubbleTimer > 0) {
@@ -695,31 +927,39 @@ class KozminskiEscapeGame {
     const ctx = this.ctx;
     ctx.clearRect(0, 0, this.width, this.height);
 
-    // 1. Tło Kampusu (3 strefy: Budynek A, Zielone Patio, Budynek D)
+    // 1. Tło Kampusu - dynamicznie pomalowane wg pogody:
+    // Zielono (słonecznie), Niebiesko (deszczowo) lub Czarno (noc)
     this.renderCampusBackground(ctx);
 
     // 2. Ściany i przeszkody kampusu
     this.renderWalls(ctx);
 
-    // 3. Statua Lwa Koźmińskiego
+    // 3. Efekty pogodowe terenu (deszcz lub nocna aura)
+    if (this.weather.condition === 'rainy') {
+      this.renderRain(ctx);
+    } else if (this.weather.condition === 'night') {
+      this.renderNightAtmosphere(ctx);
+    }
+
+    // 4. Statua Lwa Koźmińskiego
     this.renderLionStatue(ctx);
 
-    // 4. Brama wyjściowa / Dziekanat (jeśli 30 ECTS)
+    // 5. Brama wyjściowa / Dziekanat (jeśli 30 ECTS)
     this.renderExitGate(ctx);
 
-    // 5. Przedmioty (ECTS, Kawy)
+    // 6. Przedmioty (ECTS, Kawy)
     this.renderItems(ctx);
 
-    // 6. Cząsteczki
+    // 7. Cząsteczki
     this.renderParticles(ctx);
 
-    // 7. Egzaminator (Profesor)
+    // 8. Egzaminator (Profesor)
     this.renderExaminer(ctx);
 
-    // 8. Student (Gracz)
+    // 9. Student (Gracz)
     this.renderPlayer(ctx);
 
-    // 9. Komunikat pauzy na canvasie
+    // 10. Komunikat pauzy na canvasie
     if (this.state === GameState.PAUSED) {
       ctx.fillStyle = 'rgba(7, 21, 43, 0.7)';
       ctx.fillRect(0, 0, this.width, this.height);
@@ -736,64 +976,260 @@ class KozminskiEscapeGame {
   }
 
   renderCampusBackground(ctx) {
-    // Strefa 1: Budynek A (Hol Główny) - posadzka w szachownicę / kafelki
-    ctx.fillStyle = '#101d30';
-    ctx.fillRect(0, 0, 260, this.height);
+    const cond = this.weather.condition;
 
-    // Kafelki w Holu A
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
-    ctx.lineWidth = 1;
-    for (let x = 0; x < 260; x += 32) {
+    if (cond === 'sunny') {
+      // ==========================================
+      // SŁONECZNIE: TEREN KAMPUSU POMALOWANY NA ZIELONO
+      // ==========================================
+      // Strefa 1: Budynek A (Hol Główny) - posadzka w odcieniach głębokiej zieleni butelkowej
+      ctx.fillStyle = '#0d2818';
+      ctx.fillRect(0, 0, 260, this.height);
+
+      // Kafelki w Holu A (jasnozielona siatka)
+      ctx.strokeStyle = 'rgba(74, 222, 128, 0.09)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 260; x += 32) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, this.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < this.height; y += 32) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(260, y);
+        ctx.stroke();
+      }
+
+      // Strefa 2: Zielone Patio ALK - soczysta zieleń trawnika i ścieżek
+      ctx.fillStyle = '#14532d';
+      ctx.fillRect(260, 0, 280, this.height);
+
+      // Ścieżka na Patio (jasna zieleń parkowa)
+      ctx.fillStyle = '#166534';
+      ctx.fillRect(360, 0, 80, this.height);
+      ctx.fillRect(260, 230, 280, 80);
+
+      // Ozdobne krzewy na patio (soczysta zieleń)
+      ctx.fillStyle = '#22c55e';
       ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, this.height);
-      ctx.stroke();
-    }
-    for (let y = 0; y < this.height; y += 32) {
+      ctx.arc(290, 70, 18, 0, Math.PI * 2);
+      ctx.arc(510, 70, 18, 0, Math.PI * 2);
+      ctx.arc(290, 470, 18, 0, Math.PI * 2);
+      ctx.arc(510, 470, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Strefa 3: Budynek D (Biblioteka & Dziekanat) - elegancki szmaragdowo-zielony parkiet
+      ctx.fillStyle = '#064e3b';
+      ctx.fillRect(540, 0, 260, this.height);
+
+      ctx.strokeStyle = 'rgba(110, 231, 183, 0.1)';
+      for (let x = 540; x < this.width; x += 36) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, this.height);
+        ctx.stroke();
+      }
+
+      // Ciepła słoneczna poświata nad całym zielonym kampusem
+      const sunGrad = ctx.createRadialGradient(400, 120, 20, 400, 120, 480);
+      sunGrad.addColorStop(0, 'rgba(251, 191, 36, 0.08)');
+      sunGrad.addColorStop(1, 'rgba(34, 197, 94, 0.02)');
+      ctx.fillStyle = sunGrad;
+      ctx.fillRect(0, 0, this.width, this.height);
+
+    } else if (cond === 'rainy') {
+      // ==========================================
+      // DESZCZOWO: TEREN KAMPUSU POMALOWANY NA NIEBIESKO
+      // ==========================================
+      // Strefa 1: Budynek A (Hol) - deszczowy błękit
+      ctx.fillStyle = '#0b2138';
+      ctx.fillRect(0, 0, 260, this.height);
+
+      // Kafelki w Holu A (niebieskie linie posadzki)
+      ctx.strokeStyle = 'rgba(96, 165, 250, 0.12)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 260; x += 32) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, this.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < this.height; y += 32) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(260, y);
+        ctx.stroke();
+      }
+
+      // Strefa 2: Zielone Patio ALK - mokry, niebieski teren w deszczu
+      ctx.fillStyle = '#1e3a8a';
+      ctx.fillRect(260, 0, 280, this.height);
+
+      // Ścieżka na Patio (intensywny kobaltowy błękit)
+      ctx.fillStyle = '#1d4ed8';
+      ctx.fillRect(360, 0, 80, this.height);
+      ctx.fillRect(260, 230, 280, 80);
+
+      // Ozdobne krzewy na patio (ciemny morski błękit)
+      ctx.fillStyle = '#0284c7';
       ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(260, y);
-      ctx.stroke();
-    }
+      ctx.arc(290, 70, 18, 0, Math.PI * 2);
+      ctx.arc(510, 70, 18, 0, Math.PI * 2);
+      ctx.arc(290, 470, 18, 0, Math.PI * 2);
+      ctx.arc(510, 470, 18, 0, Math.PI * 2);
+      ctx.fill();
 
-    // Strefa 2: Zielone Patio ALK - trawnik i drewniane ścieżki
-    ctx.fillStyle = '#0a2e1d';
-    ctx.fillRect(260, 0, 280, this.height);
-
-    // Ścieżka brukowana na Patio
-    ctx.fillStyle = '#133e29';
-    ctx.fillRect(360, 0, 80, this.height);
-    ctx.fillRect(260, 230, 280, 80);
-
-    // Ozdobne krzewy na patio
-    ctx.fillStyle = '#10b981';
-    ctx.beginPath();
-    ctx.arc(290, 70, 18, 0, Math.PI * 2);
-    ctx.arc(510, 70, 18, 0, Math.PI * 2);
-    ctx.arc(290, 470, 18, 0, Math.PI * 2);
-    ctx.arc(510, 470, 18, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Strefa 3: Budynek D (Biblioteka & Dziekanat) - elegancki ciemnoniebieski parkiet
-    ctx.fillStyle = '#0c1a2c';
-    ctx.fillRect(540, 0, 260, this.height);
-
-    // Kafelki Dziekanatu
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
-    for (let x = 540; x < this.width; x += 36) {
+      // Kałuże wodne na patio odbijające światło
+      ctx.fillStyle = 'rgba(147, 197, 253, 0.18)';
       ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, this.height);
-      ctx.stroke();
+      ctx.ellipse(330, 160, 28, 14, 0, 0, Math.PI * 2);
+      ctx.ellipse(470, 360, 32, 16, 0, 0, Math.PI * 2);
+      ctx.ellipse(100, 280, 22, 10, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Strefa 3: Budynek D (Biblioteka & Dziekanat) - głęboki niebieski parkiet
+      ctx.fillStyle = '#172554';
+      ctx.fillRect(540, 0, 260, this.height);
+
+      ctx.strokeStyle = 'rgba(147, 197, 253, 0.12)';
+      for (let x = 540; x < this.width; x += 36) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, this.height);
+        ctx.stroke();
+      }
+
+    } else if (cond === 'night') {
+      // ==========================================
+      // NOC: TEREN KAMPUSU POMALOWANY NA CZARNO
+      // ==========================================
+      // Strefa 1: Budynek A (Hol) - głęboka aksamitna czerń
+      ctx.fillStyle = '#050508';
+      ctx.fillRect(0, 0, 260, this.height);
+
+      // Kafelki w Holu A (subtelne grafitowo-czarne podziały)
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < 260; x += 32) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, this.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < this.height; y += 32) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(260, y);
+        ctx.stroke();
+      }
+
+      // Strefa 2: Patio ALK - czarny teren ogrodu nocnego
+      ctx.fillStyle = '#030305';
+      ctx.fillRect(260, 0, 280, this.height);
+
+      // Ścieżka na Patio (antracytowa nocna czerń)
+      ctx.fillStyle = '#0c0d12';
+      ctx.fillRect(360, 0, 80, this.height);
+      ctx.fillRect(260, 230, 280, 80);
+
+      // Ozdobne krzewy na patio (ciemny grafit nocny)
+      ctx.fillStyle = '#18181b';
+      ctx.beginPath();
+      ctx.arc(290, 70, 18, 0, Math.PI * 2);
+      ctx.arc(510, 70, 18, 0, Math.PI * 2);
+      ctx.arc(290, 470, 18, 0, Math.PI * 2);
+      ctx.arc(510, 470, 18, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Strefa 3: Budynek D (Biblioteka & Dziekanat) - smolista czerń
+      ctx.fillStyle = '#020408';
+      ctx.fillRect(540, 0, 260, this.height);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+      for (let x = 540; x < this.width; x += 36) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, this.height);
+        ctx.stroke();
+      }
+
+      // Nocne latarnie punktowe (ciepłe stożki światła)
+      this.renderNightLanterns(ctx);
     }
 
     // Napisy stref na posadzce
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+    ctx.fillStyle = cond === 'night' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.12)';
     ctx.font = 'bold 22px Plus Jakarta Sans, sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('BUDYNEK A', 130, 50);
     ctx.fillText('ZIELONE PATIO ALK', 400, 50);
     ctx.fillText('DZIEKANAT / AULA', 670, 50);
+  }
+
+  renderNightLanterns(ctx) {
+    const lampPositions = [
+      { x: 130, y: 180, r: 95 },
+      { x: 400, y: 160, r: 115 },
+      { x: 400, y: 380, r: 115 },
+      { x: 670, y: 160, r: 95 },
+      { x: 670, y: 400, r: 95 },
+    ];
+
+    lampPositions.forEach((lamp) => {
+      const grad = ctx.createRadialGradient(lamp.x, lamp.y, 8, lamp.x, lamp.y, lamp.r);
+      grad.addColorStop(0, 'rgba(251, 191, 36, 0.22)');
+      grad.addColorStop(0.5, 'rgba(245, 158, 11, 0.08)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(lamp.x, lamp.y, lamp.r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Punkcik żarówki latarni
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(lamp.x, lamp.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  renderRain(ctx) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(147, 197, 253, 0.55)';
+    ctx.lineWidth = 1.5;
+    this.rainDrops.forEach((d) => {
+      ctx.beginPath();
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x - 4, d.y + d.length);
+      ctx.stroke();
+    });
+    ctx.restore();
+  }
+
+  renderNightAtmosphere(ctx) {
+    // Delikatne światło wokół studenta i profesora w nocy
+    const p = this.player;
+    const ex = this.examiner;
+
+    // Latarka studenta
+    const pGrad = ctx.createRadialGradient(p.x, p.y, 5, p.x, p.y, 80);
+    pGrad.addColorStop(0, 'rgba(56, 189, 248, 0.22)');
+    pGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = pGrad;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 80, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Czerwonawo-ostrzegawcza poświata wokół profesora
+    const exGrad = ctx.createRadialGradient(ex.x, ex.y, 6, ex.x, ex.y, 90);
+    exGrad.addColorStop(0, 'rgba(239, 68, 68, 0.2)');
+    exGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = exGrad;
+    ctx.beginPath();
+    ctx.arc(ex.x, ex.y, 90, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   renderWalls(ctx) {
@@ -1043,6 +1479,11 @@ class KozminskiEscapeGame {
 }
 
 // Inicjalizacja gry po załadowaniu drzewa DOM
-window.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', () => {
+    window.kozminskiGame = new KozminskiEscapeGame();
+  });
+} else {
   window.kozminskiGame = new KozminskiEscapeGame();
-});
+}
+

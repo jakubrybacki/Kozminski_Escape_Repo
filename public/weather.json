@@ -1,0 +1,10 @@
+{
+  "condition": "rainy",
+  "conditionName": "Deszczowo",
+  "temperature": "14°C",
+  "description": "Deszcz bębni o szklane zadaszenie Patio ALK. Kampus skąpany w chłodnym błękicie deszczu.",
+  "commentary": "„Żadnych wymówek przez deszcz! Prawdziwy menedżer zdaje egzamin w każdą pogodę!”",
+  "terrainColorTheme": "niebieski",
+  "source": "Fallback / Auto-symulacja (Brak GEMINI_API_KEY w środowisku)",
+  "updatedAt": "2026-11-03T16:07:43.468Z"
+}
