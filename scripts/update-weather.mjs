@@ -57,8 +57,9 @@ Zwróć odpowiedź w czystym formacie JSON:
 - terrainColorTheme: 'zielony' dla słonecznie, 'niebieski' dla deszczowo, 'czarny' dla nocy
 `;
 
+    const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
     const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
+      model: modelName,
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -98,7 +99,7 @@ Zwróć odpowiedź w czystym formacie JSON:
     const parsed = JSON.parse(response.text.trim());
     return {
       ...parsed,
-      source: 'Gemini 3.8 Flash via GitHub Actions',
+      source: `Gemini (${modelName}) via GitHub Actions`,
       updatedAt: new Date().toISOString(),
     };
   } catch (error) {
