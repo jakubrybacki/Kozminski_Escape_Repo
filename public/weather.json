@@ -1,10 +1,10 @@
 {
   "condition": "sunny",
   "conditionName": "Słonecznie",
-  "temperature": "20°C",
-  "description": "Słoneczny dzień nad kampusem ALK przy Jagiellońskiej. Zielone Patio lśni w słońcu.",
-  "commentary": "„Świetna pogoda na zaliczenie w pierwszym terminie! Zielony kampus dodaje energii!”",
+  "temperature": "22°C",
+  "description": "Nad kampusem ALK rozciąga się bezchmurne niebo, a słońce przyjemnie ogrzewa budynki A-D oraz zielone Patio. Idealna pogoda na przerwę między zajęciami.",
+  "commentary": "Słońce świeci, a student nie widzi, że na zaliczenie ma tylko jedną szansę! Oby to nie była jego ostatnia słoneczna chwila w tym semestrze. Do roboty!",
   "terrainColorTheme": "zielony",
-  "source": "Fallback / Auto-symulacja (Brak GEMINI_API_KEY w środowisku)",
-  "updatedAt": "2026-11-09T14:50:15.219Z"
+  "source": "Gemini (gemini-2.5-flash) via GitHub Actions",
+  "updatedAt": "2026-11-09T14:54:01.249Z"
 }
