@@ -2,9 +2,9 @@
   "condition": "sunny",
   "conditionName": "Słonecznie",
   "temperature": "22°C",
-  "description": "Nad kampusem ALK rozciąga się bezchmurne niebo, a słońce przyjemnie ogrzewa budynki A-D oraz zielone Patio. Idealna pogoda na przerwę między zajęciami.",
-  "commentary": "Słońce świeci, a student nie widzi, że na zaliczenie ma tylko jedną szansę! Oby to nie była jego ostatnia słoneczna chwila w tym semestrze. Do roboty!",
+  "description": "Nad kampusem ALK słońce świeci jasno, rozświetlając Zielone Patio i odbijając się od fasad budynków A-D, co tworzy idealne warunki do popołudniowych zajęć.",
+  "commentary": "Słonecznie? To świetnie! Może światło słoneczne rozjaśni wam umysły przed egzaminem. Ale pamiętajcie, że nawet w pełnym słońcu błędy w testach widać doskonale. Zero litości!",
   "terrainColorTheme": "zielony",
   "source": "Gemini (gemini-2.5-flash) via GitHub Actions",
-  "updatedAt": "2026-11-09T14:54:01.249Z"
+  "updatedAt": "2026-11-09T15:42:28.117Z"
 }
