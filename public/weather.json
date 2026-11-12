@@ -1,10 +1,10 @@
 {
-  "condition": "sunny",
-  "conditionName": "Słonecznie",
-  "temperature": "22°C",
-  "description": "Słońce mocno świeci nad kampusem ALK, oświetlając budynki A-D i Zielone Patio. Pogoda sprzyja spacerom i nauce na świeżym powietrzu.",
-  "commentary": "Słońce świeci, ale to nie znaczy, że pytania będą łatwiejsze! Skupienie, studenci, skupienie! Albo kolejna poprawka na horyzoncie, niezależnie od aury!",
-  "terrainColorTheme": "zielony",
-  "source": "Gemini (gemini-2.5-flash) via GitHub Actions",
-  "updatedAt": "2026-11-12T14:53:27.448Z"
+  "condition": "night",
+  "conditionName": "Noc",
+  "temperature": "9°C",
+  "description": "Noc nad Pragą Północ i kampusem Koźmińskiego. Korytarze opustoszały, a teren spowija czerń nocy.",
+  "commentary": "„Nocna sesja w Bibliotece ALK? Lepiej zbieraj ECTS przed świtem!”",
+  "terrainColorTheme": "czarny",
+  "source": "Fallback / Auto-symulacja (Błąd API: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}})",
+  "updatedAt": "2026-11-12T23:22:28.622Z"
 }
