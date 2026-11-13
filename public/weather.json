@@ -1,10 +1,10 @@
 {
   "condition": "night",
   "conditionName": "Noc",
-  "temperature": "9°C",
-  "description": "Noc nad Pragą Północ i kampusem Koźmińskiego. Korytarze opustoszały, a teren spowija czerń nocy.",
-  "commentary": "„Nocna sesja w Bibliotece ALK? Lepiej zbieraj ECTS przed świtem!”",
+  "temperature": "10°C",
+  "description": "Nad kampusem ALK panuje jeszcze głęboka noc. Budynki A-D i Zielone Patio spowite są w ciszy, oczekując na wschód słońca i pierwszych studentów.",
+  "commentary": "6 rano to już pora na pierwszą kawę, a nie spanie! Czy studenci ALK śpią, czy może... przygotowują się do egzaminów? Oby to drugie! A jak wam poszedł egzamin z... ciemności?",
   "terrainColorTheme": "czarny",
-  "source": "Fallback / Auto-symulacja (Błąd API: {\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}})",
-  "updatedAt": "2026-11-12T23:22:28.622Z"
+  "source": "Gemini (gemini-2.5-flash) via GitHub Actions",
+  "updatedAt": "2026-11-13T05:53:34.077Z"
 }
