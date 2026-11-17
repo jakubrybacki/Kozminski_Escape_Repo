@@ -1,10 +1,10 @@
 {
-  "condition": "night",
-  "conditionName": "Noc",
-  "temperature": "10°C",
-  "description": "Nad kampusem ALK panuje głęboka noc. Budynki A-D i Zielone Patio spoczywają w ciemnościach, otulone ciszą przerywaną jedynie odległym szumem miasta.",
-  "commentary": "Noc jest idealna do nauki, nie do spania! Jeśli nie wiesz, co to jest amortyzacja, to nawet w słońcu będziesz miał ciemność w głowie. Oby jutrzejszy egzamin nie okazał się dla Was czarną magią.",
-  "terrainColorTheme": "czarny",
+  "condition": "sunny",
+  "conditionName": "Słonecznie",
+  "temperature": "22°C",
+  "description": "Nad kampusem ALK panuje piękna, słoneczna pogoda. Promienie słońca oświetlają budynki A-D, a Zielone Patio prezentuje się wyjątkowo urokliwie w pełnym blasku.",
+  "commentary": "Słońce świeci, ale czy w głowach też tak jasno? Mam nadzieję, że na egzaminie nie będziecie świecić pustkami jak bezchmurne niebo. Czas na naukę, nie na opalanie!",
+  "terrainColorTheme": "zielony",
   "source": "Gemini (gemini-2.5-flash) via GitHub Actions",
-  "updatedAt": "2026-11-17T01:45:16.259Z"
+  "updatedAt": "2026-11-17T15:43:57.753Z"
 }
