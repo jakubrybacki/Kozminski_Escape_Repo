@@ -1,10 +1,10 @@
 {
-  "condition": "night",
-  "conditionName": "Noc",
-  "temperature": "9°C",
-  "description": "Głęboka noc spowija kampus ALK, ulice są puste, a światła budynków migoczą w oddali. Nawet Zielone Patio śpi pod osłoną ciemności, czekając na nowy dzień.",
-  "commentary": "Egzaminy nie czekają na świt! W nocy umysł pracuje najintensywniej, albo... najgorzej. Zobaczymy, co pokażesz o pierwszej w nocy, Studencie! Obyś nie przysnął nad testem!",
-  "terrainColorTheme": "czarny",
+  "condition": "sunny",
+  "conditionName": "Słonecznie",
+  "temperature": "22°C",
+  "description": "Nad kampusem ALK słońce świeci jasno, rozświetlając budynki A-D i Zielone Patio ciepłym blaskiem. Aura sprzyja refleksji i ostatnim powtórkom przed ważnymi wyzwaniami.",
+  "commentary": "Słonecznie! Idealna pogoda, by udowodnić, że w głowie też masz słońce, a nie mroczną pustkę niewiedzy. Niech to słońce oświeci wam drogę do zaliczenia, bo inaczej czeka was ponowne spotkanie, i to nie w tak pięknych okolicznościach!",
+  "terrainColorTheme": "zielony",
   "source": "Gemini (gemini-2.5-flash) via GitHub Actions",
-  "updatedAt": "2026-11-20T00:27:01.439Z"
+  "updatedAt": "2026-11-20T15:07:56.211Z"
 }
