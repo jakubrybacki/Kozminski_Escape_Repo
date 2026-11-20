@@ -1,10 +1,10 @@
 {
-  "condition": "sunny",
-  "conditionName": "Słonecznie",
-  "temperature": "20°C",
-  "description": "Nad kampusem ALK panuje piękna, słoneczna aura. Promienie słońca delikatnie muskają fasady budynków A-D, a Zielone Patio zachęca do chwili relaksu przed egzaminem.",
-  "commentary": "Słoneczko świeci, ptaszki ćwierkają... Idealna pogoda, żeby sobie przypomnieć, że na egzaminie z Metod Numerycznych nie ma miejsca na chmury niewiedzy! Mam nadzieję, że Pana/Pani umysł jest równie jasny jak niebo nad Jagiellońską.",
-  "terrainColorTheme": "zielony",
+  "condition": "night",
+  "conditionName": "Noc",
+  "temperature": "9°C",
+  "description": "Głęboka noc spowija kampus ALK, ulice są puste, a światła budynków migoczą w oddali. Nawet Zielone Patio śpi pod osłoną ciemności, czekając na nowy dzień.",
+  "commentary": "Egzaminy nie czekają na świt! W nocy umysł pracuje najintensywniej, albo... najgorzej. Zobaczymy, co pokażesz o pierwszej w nocy, Studencie! Obyś nie przysnął nad testem!",
+  "terrainColorTheme": "czarny",
   "source": "Gemini (gemini-2.5-flash) via GitHub Actions",
-  "updatedAt": "2026-11-19T15:29:34.093Z"
+  "updatedAt": "2026-11-20T00:27:01.439Z"
 }
