@@ -1,10 +1,10 @@
 {
   "condition": "night",
   "conditionName": "Noc",
-  "temperature": "15°C",
-  "description": "Zmierzch spowija kampus ALK, a cienie wydłużają się na Zielonym Patio. Światła w salach wykładowych zaczynają świecić, zapowiadając wieczorne zajęcia lub sesje nauki.",
-  "commentary": "Egzaminator ALK ostrzega: Ciemność nie jest wymówką dla braku wiedzy! Mam nadzieję, że nocne markowanie na nauce, a nie na innych przyjemnościach, przyniesie pozytywny wynik.",
+  "temperature": "7°C",
+  "description": "Gęsty mrok spowija kampus ALK, a księżycowe światło ledwo przebija się przez chmury, rzucając długie cienie na budynki A-D i Zielone Patio. W powietrzu czuć rześki, poranny chłód.",
+  "commentary": "Noc, noc... Pamiętajcie studenci, że egzaminy nie czekają na wschód słońca. Brak snu nie jest wymówką, aby pomylić paragraf z piramidalnym nonsensem! Chyba że to był test na czujność? Wtedy gratulacje...",
   "terrainColorTheme": "czarny",
   "source": "Gemini (gemini-2.5-flash) via GitHub Actions",
-  "updatedAt": "2026-11-21T18:54:43.633Z"
+  "updatedAt": "2026-11-22T05:55:19.947Z"
 }
