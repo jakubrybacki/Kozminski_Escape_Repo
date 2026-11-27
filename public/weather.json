@@ -1,10 +1,10 @@
 {
-  "condition": "night",
-  "conditionName": "Noc",
-  "temperature": "10°C",
-  "description": "Nad kampusem ALK zapadła głęboka noc. Budynki A-D i Zielone Patio spowija ciemność, a jedynie nieliczne światła rozświetlają kampus.",
-  "commentary": "Noc, noc... Idealna pora na naukę, nie na sen! Jeśli liczysz, że ciemność ukryje twoje braki, to się mylisz. Egzamin z Logiki Algorytmicznej zweryfikuje wszystko, bez względu na porę dnia!",
-  "terrainColorTheme": "czarny",
+  "condition": "sunny",
+  "conditionName": "Słonecznie",
+  "temperature": "15°C",
+  "description": "Nad kampusem ALK rozpościera się błękitne niebo, a promienie porannego słońca delikatnie muskają ceglane elewacje budynków A-D. Zielone Patio lśni świeżą rosą, zapowiadając ciepły dzień.",
+  "commentary": "Słońce świeci prosto w oczy, ale to żaden powód, by nie widzieć odpowiedzi na pytania egzaminacyjne! Skupienie, studencie, bo za chwilę będzie ciemno z wrażenia!",
+  "terrainColorTheme": "zielony",
   "source": "Gemini (gemini-2.5-flash) via GitHub Actions",
-  "updatedAt": "2026-11-26T21:11:36.331Z"
+  "updatedAt": "2026-11-27T07:37:28.605Z"
 }
